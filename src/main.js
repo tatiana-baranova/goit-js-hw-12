@@ -69,6 +69,7 @@ formSearch.addEventListener("submit", async (event) => {
                 message: "Sorry, no images found!",
                 position: "topRight",
             });
+            event.target.reset();
             return;
         }
 
