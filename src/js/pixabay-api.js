@@ -20,7 +20,7 @@ async function getImages(query, page = 1) {
                 per_page: 15,
             }
         });
-        console.log(data);
+        // console.log(data);
         
         if (!data || !data.hits || data.hits.length === 0) {
             throw new Error('No images found for the query');

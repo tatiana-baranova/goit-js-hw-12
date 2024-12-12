@@ -1,6 +1,6 @@
 export default reflectionImages;
 function reflectionImages(images) {
-    const markup = images.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
+    return images.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
     <a class="gallery-item" href="${largeImageURL}">
     <div class="gallery-image">
     <img class="image" src="${webformatURL}" alt="${tags}">
@@ -27,5 +27,5 @@ function reflectionImages(images) {
     </div>
     </a>
     `).join("");
-    gallery.insertAdjacentHTML("beforeend", markup);
+    
 }
