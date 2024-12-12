@@ -82,10 +82,8 @@ formSearch.addEventListener("submit", async (event) => {
         // console.log(data.totalHits);
         
         totalHits = data.totalHits;
-        if (currentPage * perPage < totalHits) {
-            showMore();
-        }
-    
+        showMore();
+    event.target.reset();
     }
     catch (error) {
         
@@ -101,40 +99,56 @@ formSearch.addEventListener("submit", async (event) => {
 
 });
 
-// buttonLoad.addEventListener("click", async () => {
-//     currentPage += 1;
-//     showLoader();
-//     try {
-//         const data = await getImages(searchQuery ,currentPage);
-//         hiddenLoader();
-//         const markup = reflectionImages(data.hits);
-//         gallery.insertAdjacentHTML("beforeend", markup);
-//         lightbox.refresh();
-//             lightbox.refresh();
-//         // reflectionImages(data.hits);
-//         // lightbox.refresh();
+buttonLoad.addEventListener("click", async () => {
+    currentPage += 1;
+    buttonLoad.disabled = true;
+    hiddenMore();
+    showLoader();
 
-//         if (currentPage * perPage >= totalHits) {
-//             hiddenMore();
-//             iziToast.info({
-//                 title: "End results",
-//                 message: "We're sorry, but you've reached the end of search results.",
-//                 position: "topRight",
-//             });
-//         }
-//         const { height: cardHeight } = document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
-//     window.scrollBy({
-//       top: cardHeight * 2,
-//     behavior: "smooth",
-//     });
-//     } catch (error) {
-//         hiddenLoader();
-//         iziToast.error({
-//                 title: "Error",
-//                 message: "Sorry, there are no images matching your search query. Please try again!",
-//                 position: 'topRight',
-//         });
-//         // event.target.reset();
+    try {
+        const data = await getImages(searchQuery, currentPage);
+        hiddenLoader();
+        buttonLoad.disabled = false;
+        showMore();
+        if (!data || !data.hits || data.hits.length === 0) {
+            hiddenMore(); 
+            iziToast.info({
+                title: "End results",
+                message: "We're sorry, but you've reached the end of search results.",
+                position: "topRight",
+            });
+            return;
+        }
+
+        const markup = reflectionImages(data.hits);
+        gallery.insertAdjacentHTML("beforeend", markup);
+
+        lightbox.refresh();
+
         
-//     }
-// })
+        if (currentPage * perPage >= totalHits) {
+            hiddenMore(); 
+            iziToast.info({
+                title: "End results",
+                message: "We're sorry, but you've reached the end of search results.",
+                position: "topRight",
+            });
+        }
+
+        const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
+        window.scrollBy({
+            top: cardHeight * 2,
+            behavior: "smooth",
+        });
+    } catch (error) {
+        hiddenLoader();
+        buttonLoad.disabled = false;
+        console.error("Error during loading more images:", error);
+        iziToast.error({
+            title: "Error",
+            message: "Sorry, there are no images matching your search query. Please try again!",
+            position: "topRight",
+        });
+    }
+});
+
