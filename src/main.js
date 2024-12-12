@@ -33,6 +33,7 @@ const hiddenMore = () => buttonLoad.classList.replace("load-more", "hidden")
 let currentPage = 1;
 const perPage = 15;
 let searchQuery = "";
+let totalHits = 0;
 
 hiddenMore();
 
@@ -60,7 +61,7 @@ formSearch.addEventListener("submit", async (event) => {
         // console.log("Fetching images...");
         const data = await getImages(searchQuery, currentPage);
         // console.log("Received data:", data);
-
+        showLoader();
         if (!data || !data.hits || data.hits.length === 0) {
             hiddenLoader();
             iziToast.info({
@@ -71,13 +72,14 @@ formSearch.addEventListener("submit", async (event) => {
             return;
         }
 
-            const markup = reflectionImages(data.hits);
+        const markup = reflectionImages(data.hits);
+        
             // console.log("Generated HTML markup:", markup);
             gallery.insertAdjacentHTML("beforeend", markup);
             lightbox.refresh();
         // console.log("Lightbox refreshed.");
 
-        console.log(data.totalHits);
+        // console.log(data.totalHits);
         
         totalHits = data.totalHits;
         if (currentPage * perPage < totalHits) {
