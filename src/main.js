@@ -112,18 +112,18 @@ formSearch.addEventListener("submit", async (event) => {
 });
 
 buttonLoad.addEventListener("click", async () => {
-    hiddenMore();
-    showLoader();
     currentPage += 1;
+    showLoader();
+    hiddenMore();
     buttonLoad.disabled = true;
     
     
     try {
         const data = await getImages(searchQuery, currentPage);
-        hiddenLoader();
         buttonLoad.disabled = false;
         showMore();
         if (!data || !data.hits || data.hits.length === 0) {
+            hiddenLoader();
             hiddenMore(); 
             iziToast.info({
                 title: "End results",
@@ -132,13 +132,14 @@ buttonLoad.addEventListener("click", async () => {
             });
             return;
         }
-
         const markup = reflectionImages(data.hits);
         gallery.insertAdjacentHTML("beforeend", markup);
         lightbox.refresh();
+        // console.log(markup);
+        
         // hiddenLoader();
         updateLoadMoreButton();
-
+        hiddenLoader();
         const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
         window.scrollBy({
             top: cardHeight * 2,
