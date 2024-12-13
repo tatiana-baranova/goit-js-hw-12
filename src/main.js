@@ -48,12 +48,11 @@ const updateLoadMoreButton = () => {
     }
 };
 
-hiddenMore();
+// hiddenMore();
 
 formSearch.addEventListener("submit", async (event) => {
     event.preventDefault();
     const query = event.target.elements.searchQuery.value.trim();
-    // console.log(query);
     if (!query) {
         iziToast.error({
             title: "Error",
@@ -71,12 +70,11 @@ formSearch.addEventListener("submit", async (event) => {
     showLoader();
 
     try {
-        // console.log("Fetching images...");
         const data = await getImages(searchQuery, currentPage);
-        // console.log("Received data:", data);
-        showLoader();
+        hiddenLoader();
+        // showLoader();
         if (!data || !data.hits || data.hits.length === 0) {
-            hiddenLoader();
+            // hiddenLoader();
             iziToast.info({
                 title: "No results",
                 message: "Sorry, no images found!",
@@ -87,13 +85,9 @@ formSearch.addEventListener("submit", async (event) => {
         }
         totalHits = data.totalHits || 0;
         const markup = reflectionImages(data.hits);
-        
-            // console.log("Generated HTML markup:", markup);
             gallery.insertAdjacentHTML("beforeend", markup);
             lightbox.refresh();
-        // console.log("Lightbox refreshed.");
-
-        // console.log(data.totalHits);
+        
         hiddenLoader();
         updateLoadMoreButton();
         // totalHits = data.totalHits;
@@ -115,6 +109,8 @@ formSearch.addEventListener("submit", async (event) => {
 buttonLoad.addEventListener("click", async () => {
     currentPage += 1;
     buttonLoad.disabled = true;
+    hiddenMore();
+    showLoader();
     
     try {
         const data = await getImages(searchQuery, currentPage);
@@ -130,12 +126,11 @@ buttonLoad.addEventListener("click", async () => {
             });
             return;
         }
-        hiddenMore();
-        showLoader();
+
         const markup = reflectionImages(data.hits);
         gallery.insertAdjacentHTML("beforeend", markup);
         lightbox.refresh();
-
+        hiddenLoader();
         updateLoadMoreButton();
 
         const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
