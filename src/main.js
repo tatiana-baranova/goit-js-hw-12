@@ -13,7 +13,6 @@ import reflectionImages from "./js/render-functions";
 
 const formSearch = document.querySelector(".search-form");
 const gallery = document.querySelector(".gallery");
-// const input = document.querySelector(".form-input")
 const loader = document.querySelector("#loader");
 const buttonLoad = document.querySelector("#load-more")
 
@@ -36,6 +35,7 @@ const hiddenLoader = () => {
 const showMore = () => buttonLoad.classList.replace("hidden", "load-more");
 const hiddenMore = () => buttonLoad.classList.replace("load-more", "hidden");
 
+hiddenLoader();
 let currentPage = 1;
 const perPage = 15;
 let searchQuery = "";
@@ -54,11 +54,12 @@ const updateLoadMoreButton = () => {
     }
 };
 
-
 formSearch.addEventListener("submit", async (event) => {
     event.preventDefault();
     const query = event.target.elements.searchQuery.value.trim();
+    showLoader();
     if (!query) {
+        hiddenLoader();
         iziToast.error({
             title: "Error",
             message: "Please enter a search query!",
@@ -72,11 +73,11 @@ formSearch.addEventListener("submit", async (event) => {
     currentPage = 1
     gallery.innerHTML = "";
     hiddenMore();
-    showLoader();
+    
 
     try {
         const data = await getImages(searchQuery, currentPage);
-        hiddenLoader();
+        
         if (!data || !data.hits || data.hits.length === 0) {
             iziToast.info({
                 title: "No results",
@@ -84,6 +85,7 @@ formSearch.addEventListener("submit", async (event) => {
                 position: "topRight",
             });
             event.target.reset();
+            hiddenLoader();
             return;
         }
         totalHits = data.totalHits || 0;
@@ -133,11 +135,11 @@ buttonLoad.addEventListener("click", async () => {
             return;
         }
         const markup = reflectionImages(data.hits);
+        showLoader();
         gallery.insertAdjacentHTML("beforeend", markup);
         lightbox.refresh();
         // console.log(markup);
         
-        // hiddenLoader();
         updateLoadMoreButton();
         hiddenLoader();
         const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
