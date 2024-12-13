@@ -36,6 +36,7 @@ const showMore = () => buttonLoad.classList.replace("hidden", "load-more");
 const hiddenMore = () => buttonLoad.classList.replace("load-more", "hidden");
 
 hiddenLoader();
+
 let currentPage = 1;
 const perPage = 15;
 let searchQuery = "";
@@ -57,7 +58,9 @@ const updateLoadMoreButton = () => {
 formSearch.addEventListener("submit", async (event) => {
     event.preventDefault();
     const query = event.target.elements.searchQuery.value.trim();
+
     showLoader();
+
     if (!query) {
         hiddenLoader();
         iziToast.error({
@@ -79,13 +82,13 @@ formSearch.addEventListener("submit", async (event) => {
         const data = await getImages(searchQuery, currentPage);
         
         if (!data || !data.hits || data.hits.length === 0) {
+            hiddenLoader();
             iziToast.info({
                 title: "No results",
                 message: "Sorry, no images found!",
                 position: "topRight",
             });
             event.target.reset();
-            hiddenLoader();
             return;
         }
         totalHits = data.totalHits || 0;
@@ -115,15 +118,15 @@ formSearch.addEventListener("submit", async (event) => {
 
 buttonLoad.addEventListener("click", async () => {
     currentPage += 1;
-    showLoader();
     hiddenMore();
+    showLoader();
     buttonLoad.disabled = true;
     
     
     try {
         const data = await getImages(searchQuery, currentPage);
         buttonLoad.disabled = false;
-        showMore();
+
         if (!data || !data.hits || data.hits.length === 0) {
             hiddenLoader();
             hiddenMore(); 
@@ -135,13 +138,13 @@ buttonLoad.addEventListener("click", async () => {
             return;
         }
         const markup = reflectionImages(data.hits);
-        showLoader();
         gallery.insertAdjacentHTML("beforeend", markup);
         lightbox.refresh();
         // console.log(markup);
         
-        updateLoadMoreButton();
         hiddenLoader();
+        updateLoadMoreButton();
+        
         const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
         window.scrollBy({
             top: cardHeight * 2,
